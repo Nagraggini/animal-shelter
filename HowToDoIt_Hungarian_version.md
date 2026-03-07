@@ -407,19 +407,11 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.properties.hibernate.use_sql_comments=true
 
-#Protokoll, // után másold be a render-com-ról az Extend Database @ utáni részét.
-#Ez nem annyira biztonságos módszer.
-spring.datasource.url=jdbc:postgresql://dpg-d69k87buibrs739i5fu0-a.frankfurt-postgres.render.com/database_olpd
-
-#Ez a biztonságosabb módszer, mert nem látják az url részt.
-# TODO: Át kell javítanom a linket:
-#spring.datasource.url=jdbc:postgresql://dpg-d69k87buibrs739i5fu0-a/database_olpd
-
-# render.com-ról másold be ezeket:
-spring.datasource.username=database_olpd_user
-
-#Alapjáraton a jelszót elszokták rejteni, de ez csak demo weboldal.
-spring.datasource.password=sekoojWQ5YUGrgC3080avcnkVvgY4LSQ
+#Protokoll (Az adatokat a környezeti változóban találod.)
+# render.com-on láthatod ezeket az infókat:
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASS}
 
 # Elmentjük a logokat egy fájlba. A logokat a Controllers osztályból szedi. Kb a syso-k összegyűjtése.
 logging.file.name=logs/animals.log
@@ -427,6 +419,26 @@ logging.level.com.example.animal_shelter.controllers=INFO
 
 #Miután a fentieket beállítottad, újra kell indítani a szervert.
 ```
+
+A gyökér könyvtárba hozz létre egy .env fájlt.
+
+Tartalma:
+DB_URL=jdbc:postgresql://dpg-d69k87buibrs739i5fu0-a.frankfurt-postgres.render.com/database_olpd
+DB_USER=Nagraggini
+DB_PASS=root
+
+Majd menj fel a render.com-ra az adatbázis infó részén láthatod az Internal Database URL-t másold ki.
+Aztán a render.com-on a nem rég feltöltött web service-re menj rá. -> Environment -> Environment Variables -> Add melletti kicsi nyílra nyomj. -> Import from .env -> Másold ide a fájl tartalmát. -> Add variables.
+
+A felhasználónevet és jelszót módosítsd arra, amit a render.com-on látsz.
+A hozzáadott DB_URL-hez másold be az Internal Database URL-t az alábbi módosításokat eszközöld rajta.
+
+pl.: postgresql://*database_olpd_user:sekoojWQ5YUGrgC3080avcnkVvgY4LSQ@*dpg-d69k87buibrs739i5fu0-a/database_olpd
+
+A csillagok között lévő részt töröld ki. 
+Az elejére ezt írd: jdbc:
+
+Aztán save, rebuild and deploy gombra nyomj.
 
 # Teljes Flow
 

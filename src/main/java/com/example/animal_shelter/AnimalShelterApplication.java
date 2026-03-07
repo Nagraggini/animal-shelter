@@ -28,7 +28,7 @@ public class AnimalShelterApplication {
 	// ! Tailwind rendes import állása (npm init -y stb tailwind.config.js stb)
 
 	// & TODO: Legyen egy beléptető felület a dolgozóknak, ahol admin admin a jelszó
-	// &
+	// & -> Itt kezdted el: SpringBoot-LoginAndRegistration
 	// youtube.com/watch?v=X7pGCmVxx10&pp=ygUkSG93IHRvIGNyZWF0ZSBhIGxvZ2luIGluIHNwcmluZyBib290
 
 	// & Spring MVC Beginner Project

@@ -784,6 +784,18 @@ JSON
 ↓
 HTML táblázat
 
+## Postman
+
+cmd-ben:
+sudo apt update
+sudo apt install snapd
+sudo snap install core
+
+sudo snap install postman
+
+Elinditás cmd-ben:
+postman
+
 ## Endpoints
 
 http://localhost:8080/

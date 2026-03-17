@@ -57,7 +57,7 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
 
 # Kezdőknek
 
-[Saját webfejlesztői alapismeretekről szóló blogom](https://nagraggini.github.io/Web-practising-and-fun/Web_Development/Practising/1-HTML%20Practising/2-Blog.html)
+[Saját webfejlesztői alapismeretekről szóló blogom](https://nagraggini-blog.onrender.com/)
 
 # Spring Boot
 

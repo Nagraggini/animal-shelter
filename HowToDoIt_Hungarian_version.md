@@ -1,3 +1,60 @@
+# Miről szól ez a projekt?
+
+Ez a projekt a Spring Boot alapjait mutatja be kezdők számára, lépésről lépésre.
+
+Célja, hogy:
+- megértsd a Spring Boot működését
+- megtanuld egy teljes webalkalmazás felépítését
+- lásd a backend + frontend + adatbázis kapcsolatot
+
+A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a CRUD műveleteket.
+
+# Tartalomjegyzék
+
+- [Miről szól ez a projekt?](#miről-szól-ez-a-projekt)
+- [Tartalomjegyzék](#tartalomjegyzék)
+- [Kezdőknek](#kezdőknek)
+- [Spring Boot](#spring-boot)
+- [Új projekt létrehozása](#új-projekt-létrehozása)
+- [Dockerfile](#dockerfile)
+  - [Dockerfile tartalma](#dockerfile-tartalma)
+- [Projekt feltöltése githubra és render.com-ra](#projekt-feltöltése-githubra-és-rendercom-ra)
+  - [SSH key](#ssh-key)
+  - [Build failed](#build-failed)
+- [Projekt futtatása](#projekt-futtatása)
+- [BL Business Logic - Java logika](#bl-business-logic---java-logika)
+  - [Controllers mappa](#controllers-mappa)
+    - [HTTP módszerek:](#http-módszerek)
+  - [Models mappa](#models-mappa)
+- [Tailwind stílus használata](#tailwind-stílus-használata)
+- [CI/CD (Continuous Integration / Continuous Deployment) folyamat:](#cicd-continuous-integration--continuous-deployment-folyamat)
+- [Debug](#debug)
+- [Templating with Spring and Thymeleaf](#templating-with-spring-and-thymeleaf)
+- [Portok használata](#portok-használata)
+- [Adatbázisok](#adatbázisok)
+    - [Windows-on:](#windows-on)
+    - [Linux-on:](#linux-on)
+  - [Adatbázis létrehozása a Render.com-on](#adatbázis-létrehozása-a-rendercom-on)
+  - [\\dt-vel kilistázzuk a kettő táblát:](#dt-vel-kilistázzuk-a-kettő-táblát)
+  - [\\d animals-vel a tábla struktúráját láthatod:](#d-animals-vel-a-tábla-struktúráját-láthatod)
+- [application.properties fájl](#applicationproperties-fájl)
+- [Teljes Flow](#teljes-flow)
+- [Spring Session](#spring-session)
+- [Teszteléshez](#teszteléshez)
+  - [Gyors módszer az adatbázis eléréséhez:](#gyors-módszer-az-adatbázis-eléréséhez)
+  - [Futtatás localhost-on](#futtatás-localhost-on)
+- [REST API](#rest-api)
+  - [Régi non rest api-s controller](#régi-non-rest-api-s-controller)
+    - [non-rest api-s showAll.html](#non-rest-api-s-showallhtml)
+  - [Extra infó](#extra-infó)
+    - [Noreferrer](#noreferrer)
+  - [Projekt struktúra](#projekt-struktúra)
+  - [Helyes mappa struktúra](#helyes-mappa-struktúra)
+  - [Rendszer](#rendszer)
+  - [Postman](#postman)
+  - [Endpoints](#endpoints)
+- [Online fejlesztéshez](#online-fejlesztéshez)
+
 # Kezdőknek
 
 [Saját webfejlesztői alapismeretekről szóló blogom](https://nagraggini.github.io/Web-practising-and-fun/Web_Development/Practising/1-HTML%20Practising/2-Blog.html)
@@ -91,6 +148,7 @@ EXPOSE 8080
 
 # Alkalmazás futtatása. ENTRYPOINT: a konténer indításakor a JAR futtatása.
 ENTRYPOINT ["java","-jar","animal_shelter.jar"]
+```
 
 # Projekt feltöltése githubra és render.com-ra
 
@@ -103,7 +161,6 @@ render.com regisztrálj -> Kösd össze a github fiókoddal.
 New -> Web Service -> Válaszd ki a listából a progjekt nevét (animal_shelter)
 Language: Docker
 -> Deploy web service Kb 15 percig eltart a deploy.
-```
 
 ## SSH key
 

@@ -53,6 +53,17 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Rendszer](#rendszer)
   - [Postman](#postman)
   - [Endpoints](#endpoints)
+- [JUnit tesztek futtatásához](#junit-tesztek-futtatásához)
+  - [Online DB-vel való teszteléshez](#online-db-vel-való-teszteléshez)
+    - [GitHub Secrets beállítása](#github-secrets-beállítása)
+    - [maven.yml](#mavenyml)
+    - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
+  - [Offline H2 DB-s teszteléshez](#offline-h2-db-s-teszteléshez)
+  - [AnimalShelterApplicationTests.java fájl tartalmának módosítása](#animalshelterapplicationtestsjava-fájl-tartalmának-módosítása)
+- [Local teszthez](#local-teszthez)
+- [JUnit teszt kiírása](#junit-teszt-kiírása)
+  - [Release](#release)
+- [auto-squash](#auto-squash)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -448,6 +459,8 @@ Az application.properties fájlban rendeljük össze a weboldalt a render.com-os
 
 # application.properties fájl
 
+src/main/resources/application.properties
+
 ```
 spring.application.name=animal_shelter
 
@@ -555,7 +568,7 @@ Ezután a Spring Session JDBC automatikusan használni fogja ezt a táblát a se
 Postgresql-t [innen](https://www.postgresql.org/download/) tudod letölteni. Verzió: 16.11 Egyezzen fentebb létrehozott render.com-os adatbázissal. A telepítésközben a render.com-ról kell ki másolni az adatbázis jelszót, meg a többit. Az adatbázist be kell állítani a fentebb leírt módon.
 
 A terminálba másold be a render.com-ról a PSQL Command-ot.
-PGPASSWORD=sekoojWQ5YUGrgC3080avcnkVvgY4LSQ psql -h dpg-d69k87buibrs739i5fu0-a.frankfurt-postgres.render.com -U database_olpd_user database_olpd
+psql -h dpg-d6u0j24r85hc73fgjfr0-a.frankfurt-postgres.render.com -U database_5kzt_user -d database_5kzt
 
 Minden adat törlése, kivéve Cirmit:
 DELETE FROM animals WHERE name <> 'Cirmi';
@@ -875,6 +888,197 @@ http://localhost:8080/animals/add
 Api:
 http://localhost:8080/api/animals
 http://localhost:8080/api/animals/11
+
+# JUnit tesztek futtatásához
+
+pom.xml fájlba ezt rakd bele a dependecies részre:
+
+```bash
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+Menj a GitHub repository-dban a Settings -> Actions -> General -> 
+Pipáld be ezt: Read and write permissions
+-> Save
+
+Menj a GitHub repository-dban a Settings -> Advanced Security -> Dependency graph -> Katt az Enable gombra.
+
+
+## Online DB-vel való teszteléshez
+
+### GitHub Secrets beállítása
+
+Menj a GitHub repository-dban a Settings -> Secrets and variables -> Actions fülre.
+
+Adj hozzá új "Repository secret"-eket a Render-en kapott adatok alapján:
+
+Fontos, hogy a változóneveknek is egyezniük kell!
+
+DB_URL: (Pl. jdbc:postgresql://dpg-xxx-a.frankfurt-postgres.render.com/mydb)
+
+DB_USER: (A Render-en megadott user)
+
+DB_PASS: (A Render-en kapott jelszó)
+
+Az infókat a render.com-on láthatod a web service-en belül nyisd meg a projekted. -> Environment -> Environment Variables
+
+### maven.yml
+
+Ezt töröld ki:
+```bash
+    - name: Build with Maven
+ ```
+
+Ezt másold be:
+```bash
+
+            - name: Build and Test with Maven (Render DB)
+              env:
+        # Ezeket a GitHub Settings -> Secrets-nél kell megadnod!
+                  DB_URL: ${{ secrets.DB_URL }}
+                  DB_USER: ${{ secrets.DB_USER }}
+                  DB_PASS: ${{ secrets.DB_PASS }}
+```
+
+Behúzások (Spaces): A YAML-ben nem használhatsz Tab-ot, csak szóközöket. 
+A env: és a run: részeknek pontosan egy oszlopban kell lenniük a - name: kezdőbetűjével a fenti példa szerint.
+
+Fontos, hogy a változóneveknek is egyezniük kell mindhárom helyen (application.properties, maven.yml, GitHub Secrets)!
+
+### Engedélyezzük a db elérést
+
+A render.com alapból letiltja, hogy a Github Actions hozzáférjen az adatbázishoz.
+Nyisd meg a render.com-on az adatbázisod. -> Görgess lejebb a Networking részre. -> 
+Ezeket írd be:
+IP: 0.0.0.0/0
+Description: GitHub Actions Access
+-> Save gomb. -> Restart Database
+
+GitHub-on az Actions részen a "Re-run jobs"-ra kattints.
+
+Utána mehetnek ezek a terminálba:
+mvn clean package
+mvn test
+
+## Offline H2 DB-s teszteléshez
+
+Ha nem tudsz az online adatbázisodhoz csatlakoz, akkor használj H2 adatbázist a tesztekhez,
+A test\resources mappába hozz létre egy: application.properties fájlt.
+
+Ez legyen a tartalma:
+
+```bash
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+```
+
+pom.xml fájlba ezt másold be, ha még nincs benne:
+```bash
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+## AnimalShelterApplicationTests.java fájl tartalmának módosítása
+
+Ez a @TestPropertySource annotáció felülbírál minden fájlt. Teljesen mindegy, hogy hol van az application.properties, vagy hogy el van-e gépelve a mappa neve: a Spring ezeket az értékeket fogja használni a teszt alatt.
+
+```java
+package com.example.animal_shelter;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+
+@SpringBootTest
+@TestPropertySource(properties = {
+		"spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
+		"spring.datasource.driverClassName=org.h2.Driver",
+		"spring.datasource.username=sa",
+		"spring.datasource.password=",
+		"spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+		"spring.jpa.hibernate.ddl-auto=create-drop",
+		"spring.h2.console.enabled=false"
+})
+class AnimalShelterApplicationTests {
+
+	@Test
+	void contextLoads() {
+		// Ez a teszt csak azt ellenőrzi, hogy elindul-e az alkalmazás
+	}
+}
+```
+
+Utána mehetnek ezek a terminálba:
+mvn clean package
+mvn test
+
+# Local teszthez
+
+mvn clean package
+
+mvn test
+
+# JUnit teszt kiírása
+
+README-be ezeket írd be:
+
+![Build](https://github.com/USERNAME/REPO/actions/workflows/main.yml/badge.svg)
+![Version](https://img.shields.io/github/v/release/USERNAME/REPO)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+A badge csak akkor működik, ha van egy workflow fájlod itt:
+
+.github/workflows/main.yml
+
+Fájl tartalma:
+```yml
+name: Java CI with Maven
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Build with Maven
+        run: mvn clean test
+```
+
+## Release
+
+Repo főoldalon jobb oldalt -> Releases panel → Create new
+
+Tag version és Release title: v1.0.0
+
+Katt a Generate release notes-ra.
+
+# auto-squash 
+
+<!-- TODO -->
+Az auto-squash GitHubon (és Git-ben általában) arra való, hogy több commitot automatikusan összevonjon (squash) egyetlen tiszta commitba — főleg pull request (PR) előtt.
 
 # Online fejlesztéshez
 

@@ -1,3 +1,7 @@
+![Build](https://github.com/Nagraggini/animal-shelter/actions/workflows/main.yml/badge.svg)
+![Version](https://img.shields.io/github/v/release/Nagraggini/animal-shelter)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 # Animal Shelter Web Application
 
 This is a simple Spring Boot web application that uses Thymeleaf templates and an embedded PostgreSQL database.

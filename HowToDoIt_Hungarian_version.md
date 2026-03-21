@@ -53,6 +53,7 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Rendszer](#rendszer)
   - [Postman](#postman)
   - [Endpoints](#endpoints)
+- [JUnit teszt](#junit-teszt)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -555,7 +556,7 @@ Ezután a Spring Session JDBC automatikusan használni fogja ezt a táblát a se
 Postgresql-t [innen](https://www.postgresql.org/download/) tudod letölteni. Verzió: 16.11 Egyezzen fentebb létrehozott render.com-os adatbázissal. A telepítésközben a render.com-ról kell ki másolni az adatbázis jelszót, meg a többit. Az adatbázist be kell állítani a fentebb leírt módon.
 
 A terminálba másold be a render.com-ról a PSQL Command-ot.
-PGPASSWORD=sekoojWQ5YUGrgC3080avcnkVvgY4LSQ psql -h dpg-d69k87buibrs739i5fu0-a.frankfurt-postgres.render.com -U database_olpd_user database_olpd
+psql -h dpg-d6u0j24r85hc73fgjfr0-a.frankfurt-postgres.render.com -U database_5kzt_user -d database_5kzt
 
 Minden adat törlése, kivéve Cirmit:
 DELETE FROM animals WHERE name <> 'Cirmi';
@@ -875,6 +876,20 @@ http://localhost:8080/animals/add
 Api:
 http://localhost:8080/api/animals
 http://localhost:8080/api/animals/11
+
+# JUnit teszt
+
+pom.xml fájlba ezt rakd bele a dependecies részre:
+
+```bash
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+Github-on a repo megnyitása után. -> Actions fül -> Java with Maven -> Configure -> Commit changes...
 
 # Online fejlesztéshez
 

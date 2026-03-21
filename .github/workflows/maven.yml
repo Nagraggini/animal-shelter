@@ -22,9 +22,9 @@ jobs:
 
             - name: Build and Test with Maven (Render DB)
               env:
-                  SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
-                  SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
-                  SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASS }}
+                  DB_URL: ${{ secrets.DB_URL }}
+                  DB_USER: ${{ secrets.DB_USER }}
+                  DB_PASS: ${{ secrets.DB_PASS }}
               run: mvn -B package --file pom.xml
 
             - name: Update dependency graph

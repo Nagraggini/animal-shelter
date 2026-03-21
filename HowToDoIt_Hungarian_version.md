@@ -54,6 +54,7 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Postman](#postman)
   - [Endpoints](#endpoints)
 - [JUnit tesztek futtatásához](#junit-tesztek-futtatásához)
+  - [GitHub Secrets beállítása](#github-secrets-beállítása)
   - [maven.yml](#mavenyml)
   - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
 - [Online fejlesztéshez](#online-fejlesztéshez)
@@ -893,7 +894,8 @@ pom.xml fájlba ezt rakd bele a dependecies részre:
 </dependency>
 ```
 
-GitHub Secrets beállítása
+## GitHub Secrets beállítása
+
 Menj a GitHub repository-dban a Settings -> Secrets and variables -> Actions fülre.
 
 Adj hozzá új "Repository secret"-eket a Render-en kapott adatok alapján:
@@ -917,16 +919,19 @@ Ezt töröld ki:
 
 Ezt másold be:
 ```bash
-- name: Build and Test with Maven (Render DB)
-      env:
+
+            - name: Build and Test with Maven (Render DB)
+              env:
         # Ezeket a GitHub Settings -> Secrets-nél kell megadnod!
-        SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
-        SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
-        SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASS }}
+                  DB_URL: ${{ secrets.DB_URL }}
+                  DB_USER: ${{ secrets.DB_USER }}
+                  DB_PASS: ${{ secrets.DB_PASS }}
 ```
 
 Behúzások (Spaces): A YAML-ben nem használhatsz Tab-ot, csak szóközöket. 
 A env: és a run: részeknek pontosan egy oszlopban kell lenniük a - name: kezdőbetűjével a fenti példa szerint.
+
+Fontos, hogy a változóneveknek is egyezniük kell mindhárom helyen (application.properties, maven.yml, GitHub Secrets)!
 
 ## Engedélyezzük a db elérést
 

@@ -58,6 +58,8 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [maven.yml](#mavenyml)
   - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
 - [Második módszer: JUnit tesztek futtatásához](#második-módszer-junit-tesztek-futtatásához)
+  - [AnimalShelterApplicationTests.java fájl tartalmának módosítása](#animalshelterapplicationtestsjava-fájl-tartalmának-módosítása)
+- [Local teszthez](#local-teszthez)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -945,6 +947,10 @@ Description: GitHub Actions Access
 
 GitHub-on az Actions részen a "Re-run jobs"-ra kattints.
 
+Utána mehetnek ezek a terminálba:
+mvn clean package
+mvn test
+
 # Második módszer: JUnit tesztek futtatásához
 
 Ha nem tudsz az online adatbázisodhoz csatlakoz, akkor használj H2 adatbázist a tesztekhez,
@@ -969,6 +975,45 @@ pom.xml fájlba ezt másold be, ha még nincs benne:
 </dependency>
 ```
 
+## AnimalShelterApplicationTests.java fájl tartalmának módosítása
+
+Ez a @TestPropertySource annotáció felülbírál minden fájlt. Teljesen mindegy, hogy hol van az application.properties, vagy hogy el van-e gépelve a mappa neve: a Spring ezeket az értékeket fogja használni a teszt alatt.
+
+```java
+package com.example.animal_shelter;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+
+@SpringBootTest
+@TestPropertySource(properties = {
+		"spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
+		"spring.datasource.driverClassName=org.h2.Driver",
+		"spring.datasource.username=sa",
+		"spring.datasource.password=",
+		"spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+		"spring.jpa.hibernate.ddl-auto=create-drop",
+		"spring.h2.console.enabled=false"
+})
+class AnimalShelterApplicationTests {
+
+	@Test
+	void contextLoads() {
+		// Ez a teszt csak azt ellenőrzi, hogy elindul-e az alkalmazás
+	}
+}
+```
+
+Utána mehetnek ezek a terminálba:
+mvn clean package
+mvn test
+
+# Local teszthez
+
+mvn clean package
+
+mvn test
 
 # Online fejlesztéshez
 

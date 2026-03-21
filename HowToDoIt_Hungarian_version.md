@@ -53,7 +53,9 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Rendszer](#rendszer)
   - [Postman](#postman)
   - [Endpoints](#endpoints)
-- [JUnit teszt](#junit-teszt)
+- [JUnit tesztek futtatásához](#junit-tesztek-futtatásához)
+  - [maven.yml](#mavenyml)
+  - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -448,6 +450,8 @@ A vs code-ban a pom.xml-hez adjuk hozzá a postgresql drivert. Jobb klikk a pom.
 Az application.properties fájlban rendeljük össze a weboldalt a render.com-os adatbázissal.
 
 # application.properties fájl
+
+src/main/resources/application.properties
 
 ```
 spring.application.name=animal_shelter
@@ -877,7 +881,7 @@ Api:
 http://localhost:8080/api/animals
 http://localhost:8080/api/animals/11
 
-# JUnit teszt
+# JUnit tesztek futtatásához
 
 pom.xml fájlba ezt rakd bele a dependecies részre:
 
@@ -889,7 +893,51 @@ pom.xml fájlba ezt rakd bele a dependecies részre:
 </dependency>
 ```
 
-Github-on a repo megnyitása után. -> Actions fül -> Java with Maven -> Configure -> Commit changes...
+GitHub Secrets beállítása
+Menj a GitHub repository-dban a Settings -> Secrets and variables -> Actions fülre.
+
+Adj hozzá új "Repository secret"-eket a Render-en kapott adatok alapján:
+
+Fontos, hogy a változóneveknek is egyezniük kell!
+
+DB_URL: (Pl. jdbc:postgresql://dpg-xxx-a.frankfurt-postgres.render.com/mydb)
+
+DB_USER: (A Render-en megadott user)
+
+DB_PASS: (A Render-en kapott jelszó)
+
+Az infókat a render.com-on láthatod a web service-en belül nyisd meg a projekted. -> Environment -> Environment Variables
+
+## maven.yml
+
+Ezt töröld ki:
+```bash
+    - name: Build with Maven
+ ```
+
+Ezt másold be:
+```bash
+- name: Build and Test with Maven (Render DB)
+      env:
+        # Ezeket a GitHub Settings -> Secrets-nél kell megadnod!
+        SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
+        SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
+        SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASS }}
+```
+
+Behúzások (Spaces): A YAML-ben nem használhatsz Tab-ot, csak szóközöket. 
+A env: és a run: részeknek pontosan egy oszlopban kell lenniük a - name: kezdőbetűjével a fenti példa szerint.
+
+## Engedélyezzük a db elérést
+
+A render.com alapból letiltja, hogy a Github Actions hozzáférjen az adatbázishoz.
+Nyisd meg a render.com-on az adatbázisod. -> Görgess lejebb a Networking részre. -> 
+Ezeket írd be:
+IP: 0.0.0.0/0
+Description: GitHub Actions Access
+-> Save gomb. -> Restart Database
+
+GitHub-on az Actions részen a "Re-run jobs"-ra kattints.
 
 # Online fejlesztéshez
 

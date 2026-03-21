@@ -53,10 +53,11 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Rendszer](#rendszer)
   - [Postman](#postman)
   - [Endpoints](#endpoints)
-- [JUnit tesztek futtatásához](#junit-tesztek-futtatásához)
+- [Első módszer: JUnit tesztek futtatásához](#első-módszer-junit-tesztek-futtatásához)
   - [GitHub Secrets beállítása](#github-secrets-beállítása)
   - [maven.yml](#mavenyml)
   - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
+- [Második módszer: JUnit tesztek futtatásához](#második-módszer-junit-tesztek-futtatásához)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -882,7 +883,7 @@ Api:
 http://localhost:8080/api/animals
 http://localhost:8080/api/animals/11
 
-# JUnit tesztek futtatásához
+# Első módszer: JUnit tesztek futtatásához
 
 pom.xml fájlba ezt rakd bele a dependecies részre:
 
@@ -943,6 +944,31 @@ Description: GitHub Actions Access
 -> Save gomb. -> Restart Database
 
 GitHub-on az Actions részen a "Re-run jobs"-ra kattints.
+
+# Második módszer: JUnit tesztek futtatásához
+
+Ha nem tudsz az online adatbázisodhoz csatlakoz, akkor használj H2 adatbázist a tesztekhez,
+A test\resources mappába hozz létre egy: application.properties fájlt.
+
+Ez legyen a tartalma:
+
+```bash
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+```
+
+pom.xml fájlba ezt másold be, ha még nincs benne:
+```bash
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
 
 # Online fejlesztéshez
 

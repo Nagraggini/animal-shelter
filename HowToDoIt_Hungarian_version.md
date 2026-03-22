@@ -53,13 +53,16 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Rendszer](#rendszer)
   - [Postman](#postman)
   - [Endpoints](#endpoints)
-- [Első módszer: JUnit tesztek futtatásához](#első-módszer-junit-tesztek-futtatásához)
-  - [GitHub Secrets beállítása](#github-secrets-beállítása)
-  - [maven.yml](#mavenyml)
-  - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
-- [Második módszer: JUnit tesztek futtatásához](#második-módszer-junit-tesztek-futtatásához)
+- [JUnit tesztek futtatásához](#junit-tesztek-futtatásához)
+  - [Online DB-vel való teszteléshez](#online-db-vel-való-teszteléshez)
+    - [GitHub Secrets beállítása](#github-secrets-beállítása)
+    - [maven.yml](#mavenyml)
+    - [Engedélyezzük a db elérést](#engedélyezzük-a-db-elérést)
+  - [Offline H2 DB-s teszteléshez](#offline-h2-db-s-teszteléshez)
   - [AnimalShelterApplicationTests.java fájl tartalmának módosítása](#animalshelterapplicationtestsjava-fájl-tartalmának-módosítása)
 - [Local teszthez](#local-teszthez)
+- [JUnit teszt kiírása](#junit-teszt-kiírása)
+  - [Release](#release)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -885,7 +888,7 @@ Api:
 http://localhost:8080/api/animals
 http://localhost:8080/api/animals/11
 
-# Első módszer: JUnit tesztek futtatásához
+# JUnit tesztek futtatásához
 
 pom.xml fájlba ezt rakd bele a dependecies részre:
 
@@ -897,7 +900,16 @@ pom.xml fájlba ezt rakd bele a dependecies részre:
 </dependency>
 ```
 
-## GitHub Secrets beállítása
+Menj a GitHub repository-dban a Settings -> Actions -> General -> 
+Pipáld be ezt: Read and write permissions
+-> Save
+
+Menj a GitHub repository-dban a Settings -> Advanced Security -> Dependency graph -> Katt az Enable gombra.
+
+
+## Online DB-vel való teszteléshez
+
+### GitHub Secrets beállítása
 
 Menj a GitHub repository-dban a Settings -> Secrets and variables -> Actions fülre.
 
@@ -913,7 +925,7 @@ DB_PASS: (A Render-en kapott jelszó)
 
 Az infókat a render.com-on láthatod a web service-en belül nyisd meg a projekted. -> Environment -> Environment Variables
 
-## maven.yml
+### maven.yml
 
 Ezt töröld ki:
 ```bash
@@ -936,7 +948,7 @@ A env: és a run: részeknek pontosan egy oszlopban kell lenniük a - name: kezd
 
 Fontos, hogy a változóneveknek is egyezniük kell mindhárom helyen (application.properties, maven.yml, GitHub Secrets)!
 
-## Engedélyezzük a db elérést
+### Engedélyezzük a db elérést
 
 A render.com alapból letiltja, hogy a Github Actions hozzáférjen az adatbázishoz.
 Nyisd meg a render.com-on az adatbázisod. -> Görgess lejebb a Networking részre. -> 
@@ -951,7 +963,7 @@ Utána mehetnek ezek a terminálba:
 mvn clean package
 mvn test
 
-# Második módszer: JUnit tesztek futtatásához
+## Offline H2 DB-s teszteléshez
 
 Ha nem tudsz az online adatbázisodhoz csatlakoz, akkor használj H2 adatbázist a tesztekhez,
 A test\resources mappába hozz létre egy: application.properties fájlt.
@@ -1014,6 +1026,53 @@ mvn test
 mvn clean package
 
 mvn test
+
+# JUnit teszt kiírása
+
+README-be ezeket írd be:
+
+![Build](https://github.com/USERNAME/REPO/actions/workflows/main.yml/badge.svg)
+![Version](https://img.shields.io/github/v/release/USERNAME/REPO)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+A badge csak akkor működik, ha van egy workflow fájlod itt:
+
+.github/workflows/main.yml
+
+Fájl tartalma:
+```yml
+name: Java CI with Maven
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Build with Maven
+        run: mvn clean test
+```
+
+## Release
+
+Repo főoldalon jobb oldalt -> Releases panel → Create new
+
+Tag version és Release title: v1.0.0
+
+Katt a Generate release notes-ra.
 
 # Online fejlesztéshez
 

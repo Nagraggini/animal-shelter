@@ -63,6 +63,7 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
 - [Local teszthez](#local-teszthez)
 - [JUnit teszt kiírása](#junit-teszt-kiírása)
   - [Release](#release)
+- [auto-squash](#auto-squash)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
 # Kezdőknek
@@ -1073,6 +1074,11 @@ Repo főoldalon jobb oldalt -> Releases panel → Create new
 Tag version és Release title: v1.0.0
 
 Katt a Generate release notes-ra.
+
+# auto-squash 
+
+<!-- TODO -->
+Az auto-squash GitHubon (és Git-ben általában) arra való, hogy több commitot automatikusan összevonjon (squash) egyetlen tiszta commitba — főleg pull request (PR) előtt.
 
 # Online fejlesztéshez
 

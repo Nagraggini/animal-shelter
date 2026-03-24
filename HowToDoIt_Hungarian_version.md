@@ -61,8 +61,9 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
   - [Offline H2 DB-s teszteléshez](#offline-h2-db-s-teszteléshez)
   - [AnimalShelterApplicationTests.java fájl tartalmának módosítása](#animalshelterapplicationtestsjava-fájl-tartalmának-módosítása)
 - [Local teszthez](#local-teszthez)
-- [JUnit teszt kiírása](#junit-teszt-kiírása)
+- [JUnit teszt kiírása a fő oldalra és készítése](#junit-teszt-kiírása-a-fő-oldalra-és-készítése)
   - [Release](#release)
+  - [Tesztlefedettség ellenőrzése (jacoco)](#tesztlefedettség-ellenőrzése-jacoco)
 - [auto-squash](#auto-squash)
 - [Online fejlesztéshez](#online-fejlesztéshez)
 
@@ -1028,7 +1029,9 @@ mvn clean package
 
 mvn test
 
-# JUnit teszt kiírása
+mvn clean verify
+
+# JUnit teszt kiírása a fő oldalra és készítése
 
 README-be ezeket írd be:
 
@@ -1041,31 +1044,40 @@ A badge csak akkor működik, ha van egy workflow fájlod itt:
 .github/workflows/main.yml
 
 Fájl tartalma:
+
 ```yml
-name: Java CI with Maven
+name: Java CI with Maven # CI (Continuous Integration)
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+on: # Minden push és pull-ál lefut.
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+jobs: # Maga a pipeline.
+    build:
+        runs-on: ubuntu-latest # Linux gépen fut.
 
-    steps:
-      - uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4 # Kód letöltése.
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: "17"
-          distribution: "temurin"
+            - name: Set up JDK 17 + cache
+              uses: actions/setup-java@v4 #Java beállítása
+              with:
+                  java-version: "17"
+                  distribution: "temurin"
+                  cache: maven # Nem tölti le mindig újra a dependency-ket, sokkal gyorsabb a build.
 
-      - name: Build with Maven
-        run: mvn clean test
+            - name: Build & Test # CD (Continuous Deployment). Deploy a szerverre.
+              run: mvn clean verify # Build + teszt. Lefordítja a projektet és lefuttatja a teszteket. +integrációs tesztek, lifecycle végigmegy
+              # mvn clean test -> Build + teszt. Lefordítja a projektet és lefuttatja a teszteket.
 ```
+
+A szóközök és a tabok fontosak, ha nincs jó helyen valami, akkor le se fog futni.
+
+Ha megvan, akkor írd be ezt a terminálba: mvn clean verify
+Ezzel le tudod csekkolni magad, hogy mit rontottál el.
 
 ## Release
 
@@ -1075,10 +1087,60 @@ Tag version és Release title: v1.0.0
 
 Katt a Generate release notes-ra.
 
+## Tesztlefedettség ellenőrzése (jacoco)
+
+A jacoco teszttel le lehet csekkolni, hogy a kód hány százaléka van letesztelve a JUnit tesztekkel.
+Terminálban:  mvn clean verify
+Itt láthatod az eredményt: target/site/jacoco/index.html -> Jobb klikk -> Live server.
+
+A pom.xml fájlban a <plugins> részbe másold be ezt:
+
+```xml
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>      
+```
+
+JaCoCo automatikusan lefut a build and test-kor. 
+
+Letölthető lesz Githubról a teszt, ha a main.yml fájlbe ezt beírod:
+
+```yml
+            - name: Upload coverage
+              uses: actions/upload-artifact@v4
+              with:
+                name: coverage-report
+                path: target/site/jacoco
+```
+A szóközök és a tabok fontosak, ha nincs jó helyen valami, akkor le se fog futni.
+
+<!-- TODO -->
+A coverage badge-t a github-on a Codecov-al lehet megjeleníteni.
+https://about.codecov.io/
+
 # auto-squash 
 
 <!-- TODO -->
 Az auto-squash GitHubon (és Git-ben általában) arra való, hogy több commitot automatikusan összevonjon (squash) egyetlen tiszta commitba — főleg pull request (PR) előtt.
+
+<!-- TODO -->
+SonarQube automatikusan elemzi a kódot. Nagy segítséget nyújt a fejlesztésben és a tesztelésben.
 
 # Online fejlesztéshez
 

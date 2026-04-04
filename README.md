@@ -1,6 +1,7 @@
 ![Build](https://github.com/Nagraggini/animal-shelter/actions/workflows/main.yml/badge.svg)
 ![Version](https://img.shields.io/github/v/release/Nagraggini/animal-shelter)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Top Language](https://img.shields.io/github/languages/top/Nagraggini/animal-shelter)
 
 # Animal Shelter Web Application
 

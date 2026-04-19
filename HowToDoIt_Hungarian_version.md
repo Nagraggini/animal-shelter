@@ -69,7 +69,7 @@ A projekt egy egyszerű "Animal Shelter" alkalmazáson keresztül mutatja be a C
 
 # Kezdőknek
 
-[Saját webfejlesztői alapismeretekről szóló blogom](https://nagraggini-blog.onrender.com/)
+[Saját webfejlesztői alapismeretekről szóló könyvem](https://nagraggini.github.io/my-awesome-book/)
 
 # Spring Boot
 

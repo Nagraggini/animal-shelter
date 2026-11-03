@@ -1,4 +1,5 @@
-render.com
+# render.com-os api beállítása
+
 Jobb szélén Account Settings menüpont.
 Görgess az API Keys szekcióhoz.
 Kattints a Create API Key gombra.

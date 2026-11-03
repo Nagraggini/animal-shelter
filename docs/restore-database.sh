@@ -61,6 +61,62 @@ find_postgres() {
         <<< "$response"
 }
 
+# Az animal-shelter web service megkeresése.
+find_web_service() {
+    local response
+
+    response=$(curl --fail-with-body --silent --show-error \
+        --get "$API/services" \
+        --data-urlencode "name=$WEB_SERVICE_NAME" \
+        --data-urlencode "type=web_service" \
+        --data-urlencode "ownerId=$OWNER_ID" \
+        --data-urlencode "limit=100" \
+        -H "Authorization: Bearer $RENDER_API_KEY")
+
+    jq -r \
+        --arg name "$WEB_SERVICE_NAME" \
+        --arg owner "$OWNER_ID" \
+        '.[] |
+         select(
+             .service.name == $name and
+             .service.type == "web_service" and
+             .service.ownerId == $owner
+         ) |
+         .service.id' <<< "$response"
+}
+
+
+# Egyetlen környezeti változó biztonságos frissítése.
+update_web_env_var() {
+    local key="$1"
+    local value="$2"
+    local body
+    local http_status
+
+    body=$(jq -n --arg value "$value" '{value: $value}')
+
+    if ! http_status=$(curl --silent --show-error \
+        --output /dev/null \
+        --write-out '%{http_code}' \
+        --request PUT \
+        "$API/services/$WEB_SERVICE_ID/env-vars/$key" \
+        -H "Authorization: Bearer $RENDER_API_KEY" \
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        --data-binary @- <<< "$body"); then
+
+        echo "ERROR: Could not update $key."
+        return 1
+    fi
+
+    if [[ ! "$http_status" =~ ^2[0-9][0-9]$ ]]; then
+        echo "ERROR: Updating $key failed (HTTP $http_status)."
+        return 1
+    fi
+
+    echo "$key updated successfully."
+}
+
 # 3. Meglévő Postgre adatbázis keresése.
 echo "Searching for Postgre database..."
 
@@ -431,6 +487,40 @@ PY
 
 echo ".env created successfully!"
 
+# 12. Render web service megkeresése.
+echo
+echo "Searching for Render web service..."
+echo "Service name: $WEB_SERVICE_NAME"
+
+mapfile -t WEB_SERVICE_IDS < <(find_web_service)
+
+if [ "${#WEB_SERVICE_IDS[@]}" -eq 0 ]; then
+    echo "ERROR: Render web service not found."
+    echo "Environment variables were not updated."
+    exit 1
+fi
+
+if [ "${#WEB_SERVICE_IDS[@]}" -gt 1 ]; then
+    echo "ERROR: Multiple web services named $WEB_SERVICE_NAME found."
+    echo "Environment variables were not updated."
+    exit 1
+fi
+
+WEB_SERVICE_ID="${WEB_SERVICE_IDS[0]}"
+
+echo "Web service found: $WEB_SERVICE_ID"
+
+# 13. Render Environment Variables frissítése.
+echo
+echo "Updating Render environment variables..."
+
+update_web_env_var "DB_URL" "$SPRING_DB_URL"
+update_web_env_var "DB_USER" "$DB_USER"
+update_web_env_var "DB_PASS" "$DB_PASS"
+
+echo
+echo "All database environment variables updated!"
+
 # 12. PostgreSQL csatlakozás és tábla létrehozása.
 echo
 echo "Connecting to PostgreSQL..."
@@ -448,6 +538,32 @@ CREATE TABLE IF NOT EXISTS animals (
 \dt
 
 SQL
+
+# 14. Új deployment indítása.
+echo
+echo "Triggering Render deployment..."
+
+if ! DEPLOY_HTTP_STATUS=$(curl --silent --show-error \
+    --output /dev/null \
+    --write-out '%{http_code}' \
+    --request POST \
+    "$API/services/$WEB_SERVICE_ID/deploys" \
+    -H "Authorization: Bearer $RENDER_API_KEY" \
+    -H "Accept: application/json"); then
+
+    echo "ERROR: Could not trigger deployment."
+    exit 1
+fi
+
+if [[ "$DEPLOY_HTTP_STATUS" != "201" &&
+      "$DEPLOY_HTTP_STATUS" != "202" ]]; then
+
+    echo "ERROR: Deployment request failed."
+    echo "HTTP status: $DEPLOY_HTTP_STATUS"
+    exit 1
+fi
+
+echo "Deployment successfully requested!"
 
 unset DB_PASS
 

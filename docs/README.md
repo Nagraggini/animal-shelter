@@ -60,6 +60,30 @@ chmod +x restore-database.sh
 chmod +x setup-github-secrets.sh
 ./setup-github-secrets.sh
 ```
+
+Aztán a render.com-on a nem rég feltöltött web service-re menj rá. -> Environment -> Environment Variables -> Add melletti kicsi nyílra nyomj. -> Import from .env -> Másold ide a fájl tartalmát. 
+A DB_URL-nek "jdbc:"-vel kell kezdődnie.-> Add variables.
+
+A render.com-n lévő adatbázis Internal Database URL-nek ugyanannak kell lennie mint a webservice-n lévő environmentnek. 
+
+## GitHub Secrets beállítása
+
+Menj a GitHub repository-dban a Settings -> Secrets and variables -> Actions fülre.
+
+Adj hozzá új "Repository secret"-eket a Render-en kapott adatok alapján:
+
+Fontos, hogy a változóneveknek is egyezniük kell!
+
+DB_URL: jdbc:postgresql://<hostname>:<port>/<database> (Pl. jdbc:postgresql://dpg-xxx-a.frankfurt-postgres.render.com/mydb)
+
+DB_USER: (A Render-en megadott user)
+
+DB_PASS: (A Render-en kapott jelszó)
+
+Az infókat a render.com-on láthatod a web service-en belül nyisd meg a projekted. -> Environment -> Environment Variables
+
+## Commitolás
+
 ```bash
 git add .
 git commit -m "fix: create a new connection to brand new database "
